@@ -49,6 +49,9 @@ class CustomTextFormField extends StatefulWidget {
     this.prefixText,
     this.autofillHints,
     this.textInputAction,
+    this.disabledBorder,
+    this.prefixIconColor,
+    this.suffixIconColor,
   });
 
   /// This is the text editing controller
@@ -174,6 +177,15 @@ class CustomTextFormField extends StatefulWidget {
 
   /// This is the optional input action
   final TextInputAction? textInputAction;
+
+  /// This is the disabled border style
+  final InputBorder? disabledBorder;
+
+  /// This is the prefix icon color
+  final Color? prefixIconColor;
+
+  /// This is the suffix icon color
+  final Color? suffixIconColor;
   @override
   State<CustomTextFormField> createState() => _CustomTextFormFieldState();
 }
@@ -183,6 +195,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   late bool obscureText;
   late bool enableSuggestions;
   late bool autoCorrect;
+  Color? labelColor;
 
   @override
   void initState() {
@@ -209,7 +222,21 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         focusNode: widget.focusNode,
         enabled: widget.enabled,
         textAlign: widget.textAlign,
-        validator: widget.validator,
+        validator: (value) {
+          final validator = widget.validator?.call(value);
+          if (validator != null) {
+            if (!mounted) return validator;
+            setState(() {
+              labelColor = theme.colorScheme.error;
+            });
+            return validator;
+          }
+          if (!mounted) return validator;
+          setState(() {
+            labelColor = null;
+          });
+          return validator;
+        },
         obscureText: obscureText,
         enableSuggestions: enableSuggestions,
         autocorrect: autoCorrect,
@@ -255,37 +282,32 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       prefixStyle: widget.style,
       suffix: widget.suffix,
       suffixIcon: suffixIcon,
+      suffixIconColor: widget.suffixIconColor,
       prefix: widget.prefix,
       prefixIcon: widget.prefixIcon,
+      prefixIconColor: widget.prefixIconColor,
       alignLabelWithHint: widget.alignLabelWithHint,
       filled: true,
       fillColor: Colors.transparent,
+      disabledBorder: widget.disabledBorder,
       enabledBorder: OutlineInputBorder(
         borderSide: widget.enabledBorderSide ?? borderSide,
-        borderRadius: widget.borderRadius ??
-            const BorderRadius.all(
-              Radius.circular(12),
-            ),
+        borderRadius:
+            widget.borderRadius ?? const BorderRadius.all(Radius.circular(12)),
       ),
       focusedBorder: OutlineInputBorder(
         borderSide: widget.focusedBorderSide ?? borderSide,
-        borderRadius: widget.borderRadius ??
-            const BorderRadius.all(
-              Radius.circular(12),
-            ),
+        borderRadius:
+            widget.borderRadius ?? const BorderRadius.all(Radius.circular(12)),
       ),
       errorBorder: OutlineInputBorder(
         borderSide: widget.errorBorderSide ?? errorSide,
-        borderRadius: widget.borderRadius ??
-            const BorderRadius.all(
-              Radius.circular(12),
-            ),
+        borderRadius:
+            widget.borderRadius ?? const BorderRadius.all(Radius.circular(12)),
       ),
       border: OutlineInputBorder(
-        borderRadius: widget.borderRadius ??
-            const BorderRadius.all(
-              Radius.circular(12),
-            ),
+        borderRadius:
+            widget.borderRadius ?? const BorderRadius.all(Radius.circular(12)),
       ),
       hintText: widget.hintText,
       errorStyle: customTextStyle(
@@ -301,7 +323,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         fontStyle: FontStyle.italic,
       ),
       labelText: widget.labelText,
-      labelStyle: customTextStyle(theme, fontSize: 14),
+      labelStyle: customTextStyle(theme, fontSize: 14, fontColor: labelColor),
       contentPadding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
     );
   }
