@@ -11,7 +11,7 @@ class CustomFilePickerForm extends StatefulWidget {
   final String label;
 
   /// The icon of the form
-  final Icon icon;
+  final Widget icon;
 
   /// The boolean if the form is required
   final bool required;
