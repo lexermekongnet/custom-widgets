@@ -19,7 +19,7 @@ class CustomSmallProfile extends StatefulWidget {
   const CustomSmallProfile({
     super.key,
     this.profileUrl = '',
-    this.profileName = 'M',
+    this.profileName = '',
     this.size = 40.0, // Default size
   });
 
@@ -32,10 +32,11 @@ class _CustomSmallProfileState extends State<CustomSmallProfile> {
     String profileName = name.trim();
     if (profileName.isEmpty) return '';
     final parts = profileName.split(' ');
+    parts.removeWhere((element) => element.isEmpty);
     if (parts.isEmpty) return '';
-    if (parts[0].isEmpty) return '';
+    if (parts.first.isEmpty) return '';
 
-    final firstInitial = parts[0][0].toUpperCase();
+    final firstInitial = parts.first[0].toUpperCase();
     if (parts.last.isEmpty) return firstInitial;
     final lastInitial = parts.length > 1 ? parts.last[0].toUpperCase() : '';
 
@@ -51,17 +52,21 @@ class _CustomSmallProfileState extends State<CustomSmallProfile> {
     if (!Uri.parse(url).isAbsolute) {
       final name = widget.profileName;
       final initials = _getInitials(name);
+      Widget child = CustomText(
+        initials,
+        fontWeight: FontWeight.bold,
+        fontSize: widget.size * 0.4, // Adjust text size proportionally
+        fontColor: surface,
+      );
+      if (initials.isEmpty) {
+        child = Icon(Icons.person, color: surface);
+      }
       return SizedBox(
         width: widget.size,
         height: widget.size,
         child: CircleAvatar(
           backgroundColor: mekongOrange(isLight),
-          child: CustomText(
-            initials,
-            fontWeight: FontWeight.bold,
-            fontSize: widget.size * 0.4, // Adjust text size proportionally
-            fontColor: surface,
-          ),
+          child: child,
         ),
       );
     }
@@ -69,9 +74,7 @@ class _CustomSmallProfileState extends State<CustomSmallProfile> {
     return SizedBox(
       width: widget.size,
       height: widget.size,
-      child: CircleAvatar(
-        backgroundImage: CachedNetworkImageProvider(url),
-      ),
+      child: CircleAvatar(backgroundImage: CachedNetworkImageProvider(url)),
     );
   }
 }

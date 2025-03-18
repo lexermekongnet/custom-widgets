@@ -7,10 +7,7 @@ import '../resource/color.dart';
 /// A custom widget class of [Shimmer] with MekongNet M
 class CustomLoadingWidget extends StatelessWidget {
   /// Creates an instance of [CustomLoadingWidget]
-  const CustomLoadingWidget({
-    super.key,
-    this.indicatorColor,
-  });
+  const CustomLoadingWidget({super.key, this.indicatorColor});
 
   /// This is the background color
   final Color? indicatorColor;

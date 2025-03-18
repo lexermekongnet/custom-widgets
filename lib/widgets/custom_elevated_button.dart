@@ -26,6 +26,7 @@ class CustomElevatedButton extends StatelessWidget {
 
   /// This is the [ElevatedButton] height
   final double? height;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -37,10 +38,12 @@ class CustomElevatedButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white10,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           backgroundColor: backgroundColor ?? primaryAction,
-          disabledBackgroundColor: backgroundColor?.withValues(alpha: 0.5) ??
+          disabledBackgroundColor:
+              backgroundColor?.withValues(alpha: 0.5) ??
               primaryAction.withValues(alpha: 0.5),
         ),
         child: child,
