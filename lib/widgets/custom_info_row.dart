@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../resource/color.dart';
 import 'custom_text.dart';
 
 /// A widget class for custom [Row] that looks like [ListTile] without tile color
@@ -20,7 +19,7 @@ class CustomInfoRow extends StatelessWidget {
   });
 
   /// This is the leading icon
-  final IconData icon;
+  final Widget icon;
 
   /// This is the title
   final String title;
@@ -47,8 +46,6 @@ class CustomInfoRow extends StatelessWidget {
   final double? valueSize;
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isLight = theme.brightness == Brightness.light;
     if (value.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -59,7 +56,7 @@ class CustomInfoRow extends StatelessWidget {
           Flexible(
             child: Row(
               children: [
-                Icon(icon, color: iconColor ?? mekongOrange(isLight)),
+                icon,
                 const SizedBox(width: 8),
                 Flexible(
                   child: CustomText(
