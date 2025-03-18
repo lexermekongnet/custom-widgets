@@ -35,7 +35,7 @@ class CustomStaticAutocomplete extends StatefulWidget {
   final void Function(({String label, dynamic value}))? onChanged;
 
   /// The icon of the autocomplete
-  final Icon icon;
+  final Widget icon;
 
   /// The controller of the autocomplete
   final TextEditingController? controller;

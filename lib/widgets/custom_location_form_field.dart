@@ -20,7 +20,7 @@ class CustomLocationFormField extends StatefulWidget {
   });
 
   /// The icon of the location form field
-  final Icon icon;
+  final Widget icon;
 
   /// This is [TextFormField] label text
   final String? labelText;
