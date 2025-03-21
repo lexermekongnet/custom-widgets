@@ -52,10 +52,7 @@ class CustomCard extends StatelessWidget {
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            width: borderWidth,
-            color: borderColor,
-          ),
+          side: BorderSide(width: borderWidth, color: borderColor),
         ),
         color: backgroundColor,
         surfaceTintColor: surfaceTintColor,
@@ -66,10 +63,7 @@ class CustomCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             onTap: onTap,
             onLongPress: onLongPress,
-            child: Padding(
-              padding: contentPadding,
-              child: child,
-            ),
+            child: Padding(padding: contentPadding, child: child),
           ),
         ),
       ),

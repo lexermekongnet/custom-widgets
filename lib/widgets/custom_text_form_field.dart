@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../resource/text_style.dart';
+import 'custom_icon_button.dart';
 
 /// A custom widget for customized [TextFormField] ui
 class CustomTextFormField extends StatefulWidget {
@@ -261,7 +262,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
     final borderSide = BorderSide(color: inverseSurface);
     final errorSide = BorderSide(color: error);
     Widget? suffixIcon = widget.suffixIcon;
-    final passwordSuffix = IconButton(
+    final passwordSuffix = CustomIconButton(
       onPressed: () {
         if (!mounted) return;
         setState(() {

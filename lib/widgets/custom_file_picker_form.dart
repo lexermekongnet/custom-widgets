@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../resource/text_style.dart';
 import 'custom_elevated_button.dart';
+import 'custom_icon_button.dart';
 import 'custom_text.dart';
 
 /// A custom widget class for file picker form
@@ -11,7 +12,7 @@ class CustomFilePickerForm extends StatefulWidget {
   final String label;
 
   /// The icon of the form
-  final Widget icon;
+  final Icon icon;
 
   /// The boolean if the form is required
   final bool required;
@@ -119,12 +120,12 @@ class _CustomFilePickerFormState extends State<CustomFilePickerForm> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    IconButton(
+                    CustomIconButton(
                       color: Colors.green,
                       onPressed: _pick,
                       icon: Icon(Icons.change_circle),
                     ),
-                    IconButton(
+                    CustomIconButton(
                       color: Colors.red,
                       padding: EdgeInsets.zero,
                       visualDensity: VisualDensity(
@@ -149,7 +150,7 @@ class _CustomFilePickerFormState extends State<CustomFilePickerForm> {
   }
 
   void _pick() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    final result = await FilePicker.platform.pickFiles();
     if (result == null) return;
     final file = result.files.single;
     if (!mounted) return;

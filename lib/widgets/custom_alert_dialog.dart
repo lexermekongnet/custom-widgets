@@ -5,6 +5,7 @@ class CustomAlertDialog extends StatelessWidget {
   /// Creates an instance of [CustomAlertDialog]
   const CustomAlertDialog({
     super.key,
+    this.icon,
     this.title,
     this.content,
     this.actions,
@@ -27,12 +28,16 @@ class CustomAlertDialog extends StatelessWidget {
   /// This is the actionsAlignment of [AlertDialog]
   final MainAxisAlignment? actionsAlignment;
 
+  /// This is the icon of [AlertDialog]
+  final Icon? icon;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final surface = theme.colorScheme.surface;
     return AlertDialog(
       actionsAlignment: actionsAlignment,
+      icon: icon,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       backgroundColor: surface,
       contentPadding: contentPadding ?? const EdgeInsets.fromLTRB(32, 8, 32, 8),

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../resource/color.dart';
+import 'custom_icon_button.dart';
 import 'custom_text.dart';
 import 'custom_text_form_field.dart';
 
@@ -181,7 +182,7 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
     final surface = theme.colorScheme.surface;
     final outline = theme.colorScheme.outline;
     final isLight = theme.brightness == Brightness.light;
-    Widget suffix = IconButton(
+    Widget suffix = CustomIconButton(
       onPressed: () {
         if (_focusNode.hasFocus) {
           _focusNode.unfocus();
@@ -194,7 +195,7 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
       ),
     );
     if (_controller.text.isNotEmpty) {
-      suffix = IconButton(
+      suffix = CustomIconButton(
         padding: EdgeInsets.zero,
         visualDensity: const VisualDensity(
           horizontal: VisualDensity.minimumDensity,
@@ -230,7 +231,10 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
               widget.validator ??
               (value) {
                 if (_suggestions
-                    .where((element) => element.text == value)
+                    .where(
+                      (element) =>
+                          element.text.toLowerCase() == value?.toLowerCase(),
+                    )
                     .isEmpty) {
                   return '*Invalid';
                 }

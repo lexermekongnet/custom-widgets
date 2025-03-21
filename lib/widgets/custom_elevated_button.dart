@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 /// A custom widget for customized [ElevatedButton] ui
-class CustomElevatedButton extends StatelessWidget {
+class CustomElevatedButton extends StatefulWidget {
   /// Creates an instance of [CustomElevatedButton]
   const CustomElevatedButton({
     super.key,
@@ -28,25 +30,46 @@ class CustomElevatedButton extends StatelessWidget {
   final double? height;
 
   @override
+  State<CustomElevatedButton> createState() => _CustomElevatedButtonState();
+}
+
+class _CustomElevatedButtonState extends State<CustomElevatedButton> {
+  Timer? _timer;
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primaryAction = theme.colorScheme.primary;
+
     return SizedBox(
-      width: width,
-      height: height,
+      width: widget.width,
+      height: widget.height,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed:
+            widget.onPressed != null
+                ? () {
+                  _timer?.cancel();
+                  _timer = Timer(const Duration(milliseconds: 200), () {
+                    widget.onPressed?.call();
+                  });
+                }
+                : null,
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white10,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: backgroundColor ?? primaryAction,
+          backgroundColor: widget.backgroundColor ?? primaryAction,
           disabledBackgroundColor:
-              backgroundColor?.withValues(alpha: 0.5) ??
+              widget.backgroundColor?.withValues(alpha: 0.5) ??
               primaryAction.withValues(alpha: 0.5),
         ),
-        child: child,
+        child: widget.child,
       ),
     );
   }
