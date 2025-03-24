@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../resource/color.dart';
@@ -37,7 +38,7 @@ class CustomDynamicAutocomplete extends StatefulWidget {
   final String? hintText;
 
   /// This is the select dropdown callback
-  final void Function(({String text, String value}))? onSelected;
+  final void Function(({String text, dynamic value}))? onSelected;
 
   /// This is the validator callback
   final String? Function(String?)? validator;
@@ -49,7 +50,7 @@ class CustomDynamicAutocomplete extends StatefulWidget {
   final bool? enabled;
 
   /// This is the onSaved callback
-  final void Function(String)? onSaved;
+  final void Function(dynamic)? onSaved;
 
   /// This is the onSaved callback
   final void Function()? onClear;
@@ -61,7 +62,7 @@ class CustomDynamicAutocomplete extends StatefulWidget {
   final void Function(TextEditingController)? onAutoCompleteBuild;
 
   /// This is the onChange callback
-  final void Function(String)? onChanged;
+  final void Function(dynamic)? onChanged;
 
   /// This is the icon on the left
   final Widget? prefixIcon;
@@ -70,7 +71,7 @@ class CustomDynamicAutocomplete extends StatefulWidget {
   final TextInputAction? textInputAction;
 
   /// This is the onChange callback
-  final void Function(String)? onFieldSubmitted;
+  final void Function(dynamic)? onFieldSubmitted;
 
   /// This is the icon on the right
   final Widget suffixIcon;
@@ -89,14 +90,14 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _textKey = GlobalKey();
   final FocusNode _focusNode = FocusNode();
-  List<({String text, String value})> _suggestions = [];
-  List<({String text, String value})> _allSuggestions = [];
+  List<({String text, dynamic value})> _suggestions = [];
+  List<({String text, dynamic value})> _allSuggestions = [];
   Timer? _debouncer;
 
   bool _showLoading = false;
 
   /// Add new data
-  void add(List<({String text, String value})> data) {
+  void add(List<({String text, dynamic value})> data) {
     if (!mounted) return;
     setState(() {
       _allSuggestions = data;
@@ -121,6 +122,19 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   }
 
   void _onChanged(String value) {
+    final suggestion = _getSuggestion(value);
+    if (suggestion == null) return;
+    widget.onChanged?.call(suggestion);
+  }
+
+  void _onSaved(String value) {
+    final suggestion = _getSuggestion(value);
+    if (suggestion == null) return;
+    widget.onSaved?.call(suggestion);
+  }
+
+  ({String text, dynamic value})? _getSuggestion(String value) {
+    if (!mounted) return null;
     setState(() {
       _suggestions =
           _allSuggestions
@@ -129,7 +143,9 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
               )
               .toList();
     });
-    widget.onChanged?.call(value);
+    return _suggestions.firstWhereOrNull(
+      (element) => element.text.toLowerCase() == value.toLowerCase(),
+    );
   }
 
   void _onScroll() {
@@ -225,7 +241,7 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
           focusNode: _focusNode,
           controller: _controller,
           onChanged: _onChanged,
-          onSaved: widget.onSaved,
+          onSaved: _onSaved,
           onFieldSubmitted: widget.onFieldSubmitted,
           validator:
               widget.validator ??
