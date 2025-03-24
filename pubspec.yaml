@@ -19,7 +19,6 @@ dependencies:
   flutter_iconpicker: ^3.3.3
   dartz: ^0.10.1
   equatable: ^2.0.7
-  get_it: ^8.0.3
 
 dev_dependencies:
   flutter_test:
