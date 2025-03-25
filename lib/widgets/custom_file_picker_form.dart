@@ -20,12 +20,16 @@ class CustomFilePickerForm extends StatefulWidget {
   /// A callback function that is called when the form is changed
   final void Function(String)? onChanged;
 
+  /// The list of allowed extensions
+  final List<String> allowedExtensions;
+
   /// Creates an instance of [CustomFilePickerForm]
   const CustomFilePickerForm({
     super.key,
     required this.label,
     required this.icon,
     required this.required,
+    this.allowedExtensions = const [],
     this.onChanged,
   });
 
@@ -150,7 +154,16 @@ class _CustomFilePickerFormState extends State<CustomFilePickerForm> {
   }
 
   void _pick() async {
-    final result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result;
+    if (widget.allowedExtensions.isNotEmpty) {
+      result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: widget.allowedExtensions,
+      );
+    } else {
+      result = await FilePicker.platform.pickFiles();
+    }
+
     if (result == null) return;
     final file = result.files.single;
     if (!mounted) return;
