@@ -16,6 +16,8 @@ class CustomInfoRow extends StatelessWidget {
     this.valueColor,
     this.titleSize,
     this.valueSize,
+    this.onTap,
+    this.onLongPress,
   });
 
   /// This is the leading icon
@@ -44,6 +46,12 @@ class CustomInfoRow extends StatelessWidget {
 
   /// This is the icon color
   final double? valueSize;
+
+  /// This is the onTap function
+  final void Function()? onTap;
+
+  /// This is the onLongPress function
+  final void Function()? onLongPress;
   @override
   Widget build(BuildContext context) {
     if (value.isEmpty) return const SizedBox.shrink();
@@ -75,13 +83,18 @@ class CustomInfoRow extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
-                  child: CustomText(
-                    value,
-                    overflow: TextOverflow.visible,
-                    fontWeight: FontWeight.bold,
-                    textAlign: TextAlign.right,
-                    fontColor: valueColor,
-                    fontSize: valueSize,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: onTap,
+                    onLongPress: onLongPress,
+                    child: CustomText(
+                      value,
+                      overflow: TextOverflow.visible,
+                      fontWeight: FontWeight.bold,
+                      textAlign: TextAlign.right,
+                      fontColor: valueColor,
+                      fontSize: valueSize,
+                    ),
                   ),
                 ),
                 if (suffix != null) suffix!,
