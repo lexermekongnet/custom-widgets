@@ -84,13 +84,13 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
           });
           if (widget.controller?.text != null) {
             final options =
-                widget.options
-                    .where(
-                      (element) => element.value.toLowerCase().contains(
-                        widget.controller!.text.toLowerCase(),
-                      ),
-                    )
-                    .toList();
+                widget.options.where((element) {
+                  dynamic value = element.value;
+                  if (value is! String) value = value.toString();
+                  return value.toLowerCase().contains(
+                    widget.controller!.text.toLowerCase(),
+                  );
+                }).toList();
             if (options.isNotEmpty) {
               _textEditingController?.text = options.first.label;
               widget.onChanged?.call(options.first);
