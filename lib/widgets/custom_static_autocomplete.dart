@@ -23,7 +23,7 @@ class CustomStaticAutocomplete extends StatefulWidget {
   final String label;
 
   /// The options of the autocomplete
-  final List<({String label, dynamic value})> options;
+  final List<({String text, dynamic value})> options;
 
   /// The validator of the autocomplete
   final String? Function(String?)? validator;
@@ -32,7 +32,7 @@ class CustomStaticAutocomplete extends StatefulWidget {
   final void Function(String)? onSaved;
 
   /// The on changed of the autocomplete
-  final void Function(({String label, dynamic value}))? onChanged;
+  final void Function(({String text, dynamic value}))? onChanged;
 
   /// The icon of the autocomplete
   final Widget icon;
@@ -53,7 +53,7 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
   Widget build(BuildContext context) {
     return Autocomplete(
       key: _textKey,
-      displayStringForOption: (option) => option.label,
+      displayStringForOption: (option) => option.text,
       fieldViewBuilder: (
         context,
         textEditingController,
@@ -78,7 +78,7 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
                   );
                 }).toList();
             if (options.isNotEmpty) {
-              _textEditingController?.text = options.first.label;
+              _textEditingController?.text = options.first.text;
               widget.onChanged?.call(options.first);
             }
           }
@@ -121,7 +121,7 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
             onPressed: () {
               textEditingController.clear();
               _focusNode?.unfocus();
-              widget.onChanged?.call((label: '', value: ''));
+              widget.onChanged?.call((text: '', value: ''));
             },
           );
         }
@@ -150,7 +150,7 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
                 if (widget.options
                     .where(
                       (element) =>
-                          element.label.toLowerCase() == value?.toLowerCase(),
+                          element.text.toLowerCase() == value?.toLowerCase(),
                     )
                     .isEmpty) {
                   return '*Invalid';
@@ -159,7 +159,7 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
               },
           onSaved: (x) {
             final option = widget.options.firstWhereOrNull(
-              (element) => element.label.toLowerCase() == x.toLowerCase(),
+              (element) => element.text.toLowerCase() == x.toLowerCase(),
             );
             if (option == null) return;
             widget.onChanged?.call(option);
@@ -167,7 +167,7 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
           onChanged: (x) {
             widget.controller?.text = x;
             final option = widget.options.firstWhereOrNull(
-              (element) => element.label.toLowerCase() == x.toLowerCase(),
+              (element) => element.text.toLowerCase() == x.toLowerCase(),
             );
             if (option == null) return;
             widget.onChanged?.call(option);
@@ -178,13 +178,13 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
         final options =
             widget.options
                 .where(
-                  (element) => element.label.toLowerCase().contains(
+                  (element) => element.text.toLowerCase().contains(
                     text.text.toLowerCase(),
                   ),
                 )
                 .toList();
         if (options.isEmpty) {
-          return [(label: 'EMPTY', value: 'empty')];
+          return [(text: 'EMPTY', value: 'empty')];
         }
         return options;
       },
@@ -196,7 +196,7 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
         if (options.isEmpty || options.length == 1) {
           if (options.isNotEmpty &&
               options.first.value == 'empty' &&
-              options.first.label == 'EMPTY') {
+              options.first.text == 'EMPTY') {
             child = Align(
               alignment: Alignment.topLeft,
               child: SizedBox(
@@ -224,7 +224,7 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
 
         if (options.isNotEmpty &&
             options.first.value != 'empty' &&
-            options.first.label != 'EMPTY') {
+            options.first.text != 'EMPTY') {
           child = Align(
             alignment: Alignment.topLeft,
             child: SizedBox(
@@ -243,7 +243,7 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
                   itemBuilder: (context, index) {
                     final option = options.toList()[index];
                     return ListTile(
-                      title: CustomText(option.label),
+                      title: CustomText(option.text),
                       onTap: () {
                         onSelected(option);
                         widget.onChanged?.call(option);
