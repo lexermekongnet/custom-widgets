@@ -48,20 +48,6 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
   TextEditingController? _textEditingController;
   FocusNode? _focusNode;
   final _textKey = GlobalKey();
-  @override
-  void initState() {
-    widget.controller?.addListener(() {
-      if (widget.controller?.text == null) return;
-      _textEditingController?.text = widget.controller!.text;
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    widget.controller?.removeListener(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,6 +125,13 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
             },
           );
         }
+        final text = widget.controller?.text;
+        if (text != null) {
+          if (text.isNotEmpty &&
+              text != (_textEditingController ?? textEditingController).text) {
+            (_textEditingController ?? textEditingController).text = text;
+          }
+        }
         return CustomTextFormField(
           prefixIcon: widget.icon,
           labelText: widget.label,
@@ -172,6 +165,7 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
             widget.onChanged?.call(option);
           },
           onChanged: (x) {
+            widget.controller?.text = x;
             final option = widget.options.firstWhereOrNull(
               (element) => element.label.toLowerCase() == x.toLowerCase(),
             );
