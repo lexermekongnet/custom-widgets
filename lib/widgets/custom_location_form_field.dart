@@ -8,8 +8,8 @@ class CustomLocationFormField extends StatefulWidget {
   const CustomLocationFormField({
     super.key,
     required this.icon,
-    required this.latitudeTextController,
-    required this.longitudeTextController,
+    this.latitudeTextController,
+    this.longitudeTextController,
     this.onSavedLatitude,
     this.onSavedLongitude,
     this.labelText,
@@ -29,10 +29,10 @@ class CustomLocationFormField extends StatefulWidget {
   final String? initialValue;
 
   /// This is [TextFormField] latitude text controller
-  final TextEditingController latitudeTextController;
+  final TextEditingController? latitudeTextController;
 
   /// This is [TextFormField] longitude text controller
-  final TextEditingController longitudeTextController;
+  final TextEditingController? longitudeTextController;
 
   /// This is [TextFormField] on Saved latitude call back
   final void Function(String)? onSavedLatitude;
@@ -63,20 +63,22 @@ class _CustomLocationFormFieldState extends State<CustomLocationFormField> {
 
   @override
   void initState() {
-    isLatitudeClearVisible = widget.latitudeTextController.text.isNotEmpty;
-    isLongitudeClearVisible = widget.longitudeTextController.text.isNotEmpty;
+    isLatitudeClearVisible =
+        widget.latitudeTextController?.text.isNotEmpty == true;
+    isLongitudeClearVisible =
+        widget.longitudeTextController?.text.isNotEmpty == true;
 
-    widget.latitudeTextController.addListener(() {
-      final isLatitudeNotEmpty = widget.latitudeTextController.text.isNotEmpty;
+    widget.latitudeTextController?.addListener(() {
+      final isLatitudeNotEmpty = widget.latitudeTextController?.text.isNotEmpty;
       if (!mounted) return;
       if (isLatitudeClearVisible == isLatitudeNotEmpty) return;
       setState(() {
         isLatitudeClearVisible = !isLatitudeClearVisible;
       });
     });
-    widget.longitudeTextController.addListener(() {
+    widget.longitudeTextController?.addListener(() {
       final isLongitudeNotEmpty =
-          widget.longitudeTextController.text.isNotEmpty;
+          widget.longitudeTextController?.text.isNotEmpty;
       if (!mounted) return;
       if (isLongitudeClearVisible == isLongitudeNotEmpty) return;
       setState(() {
@@ -88,8 +90,8 @@ class _CustomLocationFormFieldState extends State<CustomLocationFormField> {
 
   @override
   void dispose() {
-    widget.latitudeTextController.removeListener(() {});
-    widget.longitudeTextController.removeListener(() {});
+    widget.latitudeTextController?.removeListener(() {});
+    widget.longitudeTextController?.removeListener(() {});
     super.dispose();
   }
 
@@ -130,7 +132,7 @@ class _CustomLocationFormFieldState extends State<CustomLocationFormField> {
                         ),
                         onPressed: () {
                           if (!mounted) return;
-                          widget.latitudeTextController.clear();
+                          widget.latitudeTextController?.clear();
                         },
                         icon: const Icon(Icons.close, color: Colors.red),
                       ),
@@ -162,7 +164,7 @@ class _CustomLocationFormFieldState extends State<CustomLocationFormField> {
                         ),
                         onPressed: () {
                           if (!mounted) return;
-                          widget.longitudeTextController.clear();
+                          widget.longitudeTextController?.clear();
                         },
                         icon: const Icon(Icons.close, color: Colors.red),
                       ),
