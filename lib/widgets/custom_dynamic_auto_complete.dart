@@ -103,6 +103,9 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
       _allSuggestions = data;
       _suggestions = data;
     });
+    final suggestion = _getSuggestion(_controller.text);
+    if (suggestion == null) return;
+    widget.onSelected?.call(suggestion);
   }
 
   /// Add show loading
