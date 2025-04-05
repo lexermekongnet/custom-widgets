@@ -29,6 +29,7 @@ class CustomDynamicAutocomplete extends StatefulWidget {
     this.onFieldSubmitted,
     this.suffixIcon = const SizedBox(),
     this.controller,
+    this.fieldName,
   });
 
   /// This is the autocomplete label text
@@ -79,6 +80,9 @@ class CustomDynamicAutocomplete extends StatefulWidget {
   /// This is the optional [TextEditingController]
   final TextEditingController? controller;
 
+  /// This is the optional field name
+  final String? fieldName;
+
   @override
   CustomDynamicAutocompleteState createState() =>
       CustomDynamicAutocompleteState();
@@ -90,35 +94,30 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _textKey = GlobalKey();
   final FocusNode _focusNode = FocusNode();
-  List<({String text, dynamic value})> _suggestions = [];
-  List<({String text, dynamic value})> _allSuggestions = [];
+  final _showLoadingController = ValueNotifier(false);
+  final _hasFocusController = ValueNotifier(false);
+  final ValueNotifier<List<({String text, dynamic value})>>
+  _suggestionController = ValueNotifier([]);
+  List<({String text, dynamic value})> _allSuggestion = [];
   Timer? _debouncer;
-
-  bool _showLoading = false;
 
   /// Add new data
   void add(List<({String text, dynamic value})> data) {
-    if (!mounted) return;
-    setState(() {
-      _allSuggestions = data;
-      _suggestions = data;
-    });
+    _allSuggestion = data;
+    _suggestionController.value = data;
     final suggestion = _getSuggestion(_controller.text);
     if (suggestion == null) return;
+    _controller.text = suggestion.text;
     widget.onSelected?.call(suggestion);
   }
 
   /// Add show loading
-  void loading(bool isLoading) {
-    if (!mounted) return;
-    setState(() => _showLoading = isLoading);
-  }
+  void loading(bool isLoading) => _showLoadingController.value = isLoading;
 
   @override
   void initState() {
     super.initState();
     _controller = widget.controller ?? TextEditingController();
-    _controller.addListener(_textListener);
     _focusNode.addListener(_hasFocus);
     _scrollController.addListener(_onScroll);
     widget.onAutoCompleteBuild?.call(_controller);
@@ -137,16 +136,26 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   }
 
   ({String text, dynamic value})? _getSuggestion(String value) {
-    if (!mounted) return null;
-    setState(() {
-      _suggestions =
-          _allSuggestions
+    if (widget.fieldName != null) {
+      _suggestionController.value =
+          _allSuggestion.where((item) {
+            if (item.value is Map) {
+              return item.value[widget.fieldName].toString() == value;
+            }
+            return false;
+          }).toList();
+    } else {
+      _suggestionController.value =
+          _allSuggestion
               .where(
                 (item) => item.text.toLowerCase().contains(value.toLowerCase()),
               )
               .toList();
-    });
-    return _suggestions.firstWhereOrNull(
+    }
+    if (widget.fieldName != null && _suggestionController.value.isNotEmpty) {
+      return _suggestionController.value.first;
+    }
+    return _suggestionController.value.firstWhereOrNull(
       (element) => element.text.toLowerCase() == value.toLowerCase(),
     );
   }
@@ -165,34 +174,29 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   @override
   void dispose() {
     _focusNode.removeListener(_hasFocus);
-    _controller.removeListener(_textListener);
     _scrollController.removeListener(_onScroll);
     _focusNode.dispose();
     _scrollController.dispose();
     if (widget.controller == null) _controller.dispose();
     _debouncer?.cancel();
+    _showLoadingController.dispose();
+    _suggestionController.dispose();
+    _hasFocusController.dispose();
     super.dispose();
   }
 
   void _hasFocus() {
-    if (!mounted) return;
-    setState(() {
-      _showLoading = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_textKey.currentContext != null) {
-          Scrollable.ensureVisible(
-            _textKey.currentContext!,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        }
-      });
+    _showLoadingController.value = false;
+    _hasFocusController.value = _focusNode.hasFocus;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_textKey.currentContext != null) {
+        Scrollable.ensureVisible(
+          _textKey.currentContext!,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
     });
-  }
-
-  void _textListener() {
-    if (!mounted) return;
-    setState(() {});
   }
 
   @override
@@ -201,36 +205,7 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
     final surface = theme.colorScheme.surface;
     final outline = theme.colorScheme.outline;
     final isLight = theme.brightness == Brightness.light;
-    Widget suffix = CustomIconButton(
-      onPressed: () {
-        if (_focusNode.hasFocus) {
-          _focusNode.unfocus();
-        } else {
-          _focusNode.requestFocus();
-        }
-      },
-      icon: Icon(
-        _focusNode.hasFocus ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-      ),
-    );
-    if (_controller.text.isNotEmpty) {
-      suffix = CustomIconButton(
-        padding: EdgeInsets.zero,
-        visualDensity: const VisualDensity(
-          horizontal: VisualDensity.minimumDensity,
-        ),
-        onPressed: () {
-          FocusScope.of(context).unfocus();
-          widget.onClear?.call();
-          _controller.clear();
-          if (!mounted) return;
-          setState(() {
-            _suggestions = _allSuggestions;
-          });
-        },
-        icon: Icon(Icons.close, color: mekongOrange(isLight)),
-      );
-    }
+
     return Column(
       key: _textKey,
       mainAxisSize: MainAxisSize.min,
@@ -249,7 +224,7 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
           validator:
               widget.validator ??
               (value) {
-                if (_suggestions
+                if (_suggestionController.value
                     .where(
                       (element) =>
                           element.text.toLowerCase() == value?.toLowerCase(),
@@ -258,37 +233,83 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
                   return '*Invalid';
                 }
                 widget.onSelected?.call(
-                  _suggestions.firstWhere((element) => element.text == value),
+                  _suggestionController.value.firstWhere(
+                    (element) => element.text == value,
+                  ),
                 );
                 return null;
               },
-          suffixIcon: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              suffix,
-              widget.suffixIcon,
-              if (_showLoading)
-                SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.red,
+          suffixIcon: ValueListenableBuilder(
+            valueListenable: _showLoadingController,
+            builder: (context, loading, child) {
+              Widget suffix = ValueListenableBuilder(
+                valueListenable: _hasFocusController,
+                builder: (context, hasFocus, child) {
+                  return CustomIconButton(
+                    onPressed: () {
+                      if (_focusNode.hasFocus) {
+                        _hasFocusController.value = false;
+                        _focusNode.unfocus();
+                      } else {
+                        _hasFocusController.value = true;
+                        _focusNode.requestFocus();
+                      }
+                    },
+                    icon: Icon(
+                      hasFocus ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                    ),
+                  );
+                },
+              );
+              if (_controller.text.isNotEmpty) {
+                suffix = CustomIconButton(
+                  padding: EdgeInsets.zero,
+                  visualDensity: const VisualDensity(
+                    horizontal: VisualDensity.minimumDensity,
                   ),
-                ),
-              if (_showLoading) SizedBox(width: 8),
-            ],
+                  onPressed: () {
+                    FocusScope.of(context).unfocus();
+                    widget.onClear?.call();
+                    _controller.clear();
+                    _suggestionController.value = _allSuggestion;
+                  },
+                  icon: Icon(Icons.close, color: mekongOrange(isLight)),
+                );
+              }
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  suffix,
+                  widget.suffixIcon,
+                  if (loading)
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.red,
+                      ),
+                    ),
+                  if (loading) SizedBox(width: 8),
+                ],
+              );
+            },
           ),
         ),
-        if (_focusNode.hasFocus)
-          Material(
-            elevation: 4.0,
-            color: surface,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 200),
-              child:
-                  _suggestions.isEmpty
-                      ? SizedBox(
+        ValueListenableBuilder(
+          valueListenable: _hasFocusController,
+          builder: (context, hasFocus, child) {
+            if (!hasFocus) return const SizedBox.shrink();
+            return Material(
+              elevation: 4.0,
+              color: surface,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 200),
+                child: ValueListenableBuilder(
+                  valueListenable: _suggestionController,
+                  builder: (context, suggestions, child) {
+                    if (suggestions.isEmpty) {
+                      return SizedBox(
                         height: 50,
                         width: double.infinity,
                         child: Center(
@@ -299,36 +320,41 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
                             fontColor: outline,
                           ),
                         ),
-                      )
-                      : ListView.separated(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        controller: _scrollController,
-                        separatorBuilder:
-                            (context, index) => const Divider(height: 1),
-                        shrinkWrap: true,
-                        itemCount: _suggestions.length,
-                        itemBuilder: (context, index) {
-                          final suggestion = _suggestions[index];
-                          return ListTile(
-                            tileColor: surface,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                            ),
-                            title: CustomText(
-                              suggestion.text,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            onTap: () {
-                              _controller.text = suggestion.text;
-                              if (!mounted) return;
-                              FocusScope.of(context).unfocus();
-                              widget.onSelected?.call(suggestion);
-                            },
-                          );
-                        },
-                      ),
-            ),
-          ),
+                      );
+                    }
+                    return ListView.separated(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      controller: _scrollController,
+                      separatorBuilder:
+                          (context, index) => const Divider(height: 1),
+                      shrinkWrap: true,
+                      itemCount: suggestions.length,
+                      itemBuilder: (context, index) {
+                        final suggestion = suggestions[index];
+                        return ListTile(
+                          tileColor: surface,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                          title: CustomText(
+                            suggestion.text.trim(),
+                            fontWeight: FontWeight.bold,
+                          ),
+                          onTap: () {
+                            _controller.text = suggestion.text;
+                            if (!mounted) return;
+                            FocusScope.of(context).unfocus();
+                            widget.onSelected?.call(suggestion);
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+        ),
       ],
     );
   }
