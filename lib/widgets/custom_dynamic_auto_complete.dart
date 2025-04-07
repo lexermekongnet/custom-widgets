@@ -136,11 +136,11 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   }
 
   ({String text, dynamic value})? _getSuggestion(String value) {
-    if (widget.fieldName != null && value.isNotEmpty) {
+    if (widget.fieldName != null) {
       _suggestionController.value =
           _allSuggestion.where((item) {
             if (item.value is Map) {
-              return item.value[widget.fieldName].toString().contains(value);
+              return item.value[widget.fieldName].toString() == value;
             }
             return false;
           }).toList();
