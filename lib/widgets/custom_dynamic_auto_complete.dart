@@ -188,6 +188,11 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   void _hasFocus() {
     _showLoadingController.value = false;
     _hasFocusController.value = _focusNode.hasFocus;
+    if (_hasFocusController.value &&
+        _controller.text.isEmpty &&
+        _suggestionController.value.isEmpty) {
+      _suggestionController.value = _allSuggestion;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_textKey.currentContext != null) {
         Scrollable.ensureVisible(
