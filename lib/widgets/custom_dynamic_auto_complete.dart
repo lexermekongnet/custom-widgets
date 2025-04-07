@@ -136,11 +136,11 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   }
 
   ({String text, dynamic value})? _getSuggestion(String value) {
-    if (widget.fieldName != null) {
+    if (widget.fieldName != null && value.isNotEmpty) {
       _suggestionController.value =
           _allSuggestion.where((item) {
             if (item.value is Map) {
-              return item.value[widget.fieldName].toString() == value;
+              return item.value[widget.fieldName].toString().contains(value);
             }
             return false;
           }).toList();
@@ -188,11 +188,6 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   void _hasFocus() {
     _showLoadingController.value = false;
     _hasFocusController.value = _focusNode.hasFocus;
-    if (_hasFocusController.value &&
-        _controller.text.isEmpty &&
-        _suggestionController.value.isEmpty) {
-      _suggestionController.value = _allSuggestion;
-    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_textKey.currentContext != null) {
         Scrollable.ensureVisible(
