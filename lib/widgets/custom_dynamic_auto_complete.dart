@@ -113,6 +113,11 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   /// Initialize
   void initial(({String text, dynamic value}) data) {
     _controller.text = data.text;
+    final list = List<({String text, dynamic value})>.from([
+      data,
+      ..._suggestionController.value,
+    ]);
+    _suggestionController.value = list;
     widget.onSelected?.call(data);
   }
 
