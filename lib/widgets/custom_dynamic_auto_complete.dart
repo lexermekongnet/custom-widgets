@@ -29,7 +29,6 @@ class CustomDynamicAutocomplete extends StatefulWidget {
     this.onFieldSubmitted,
     this.suffixIcon = const SizedBox(),
     this.controller,
-    this.fieldName,
   });
 
   /// This is the autocomplete label text
@@ -79,9 +78,6 @@ class CustomDynamicAutocomplete extends StatefulWidget {
 
   /// This is the optional [TextEditingController]
   final TextEditingController? controller;
-
-  /// This is the optional field name
-  final String? fieldName;
 
   @override
   CustomDynamicAutocompleteState createState() =>
@@ -136,25 +132,13 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   }
 
   ({String text, dynamic value})? _getSuggestion(String value) {
-    if (widget.fieldName != null) {
-      _suggestionController.value =
-          _allSuggestion.where((item) {
-            if (item.value is Map) {
-              return item.value[widget.fieldName].toString() == value;
-            }
-            return false;
-          }).toList();
-    } else {
-      _suggestionController.value =
-          _allSuggestion
-              .where(
-                (item) => item.text.toLowerCase().contains(value.toLowerCase()),
-              )
-              .toList();
-    }
-    if (widget.fieldName != null && _suggestionController.value.isNotEmpty) {
-      return _suggestionController.value.first;
-    }
+    _suggestionController.value =
+        _allSuggestion
+            .where(
+              (item) => item.text.toLowerCase().contains(value.toLowerCase()),
+            )
+            .toList();
+
     return _suggestionController.value.firstWhereOrNull(
       (element) => element.text.toLowerCase() == value.toLowerCase(),
     );
