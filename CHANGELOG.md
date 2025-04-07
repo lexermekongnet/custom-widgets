@@ -4,4 +4,4 @@
 
 ## 0.0.2
 
-* Fix CustomDynamicAutocomplete fieldName filtering
+* Fix CustomDynamicAutocomplete by removing field name and adding initialize method

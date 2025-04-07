@@ -110,6 +110,12 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
   /// Add show loading
   void loading(bool isLoading) => _showLoadingController.value = isLoading;
 
+  /// Initialize
+  void initial(({String text, dynamic value}) data) {
+    _controller.text = data.text;
+    widget.onSelected?.call(data);
+  }
+
   @override
   void initState() {
     super.initState();
