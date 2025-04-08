@@ -125,6 +125,8 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
             icon: Icon(Icons.clear, color: Colors.red),
             onPressed: () {
               textEditingController.clear();
+              widget.controller?.clear();
+              _textEditingController?.clear();
               _focusNode?.unfocus();
               widget.onChanged?.call((text: '', value: ''));
             },
