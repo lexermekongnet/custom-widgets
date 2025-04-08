@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-import '../resource/color.dart';
 import 'custom_icon_button.dart';
 import 'custom_text.dart';
 import 'custom_text_form_field.dart';
@@ -199,7 +198,6 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
     final theme = Theme.of(context);
     final surface = theme.colorScheme.surface;
     final outline = theme.colorScheme.outline;
-    final isLight = theme.brightness == Brightness.light;
 
     return Column(
       key: _textKey,
@@ -260,15 +258,16 @@ class CustomDynamicAutocompleteState extends State<CustomDynamicAutocomplete> {
                 suffix = CustomIconButton(
                   padding: EdgeInsets.zero,
                   visualDensity: const VisualDensity(
+                    vertical: VisualDensity.minimumDensity,
                     horizontal: VisualDensity.minimumDensity,
                   ),
+                  icon: Icon(Icons.clear, color: Colors.red),
                   onPressed: () {
                     FocusScope.of(context).unfocus();
                     widget.onClear?.call();
                     _controller.clear();
                     _suggestionController.value = _allSuggestion;
                   },
-                  icon: Icon(Icons.close, color: mekongOrange(isLight)),
                 );
               }
               return Row(

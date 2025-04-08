@@ -117,7 +117,12 @@ class _CustomStaticAutocompleteState extends State<CustomStaticAutocomplete> {
         );
         if (textEditingController.text.isNotEmpty) {
           suffixIcon = CustomIconButton(
-            icon: Icon(Icons.clear),
+            padding: EdgeInsets.zero,
+            visualDensity: const VisualDensity(
+              vertical: VisualDensity.minimumDensity,
+              horizontal: VisualDensity.minimumDensity,
+            ),
+            icon: Icon(Icons.clear, color: Colors.red),
             onPressed: () {
               textEditingController.clear();
               _focusNode?.unfocus();

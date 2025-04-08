@@ -116,11 +116,12 @@ class CustomAutocompleteNewState extends State<CustomAutocompleteNew> {
 
   void _onChanged(String value) {
     setState(() {
-      _suggestions = _allSuggestions
-          .where(
-            (item) => item.text.toLowerCase().contains(value.toLowerCase()),
-          )
-          .toList();
+      _suggestions =
+          _allSuggestions
+              .where(
+                (item) => item.text.toLowerCase().contains(value.toLowerCase()),
+              )
+              .toList();
       _showSuggestions = value.isNotEmpty && _suggestions.isNotEmpty;
     });
     widget.onChange?.call(value);
@@ -188,7 +189,8 @@ class CustomAutocompleteNewState extends State<CustomAutocompleteNew> {
           controller: _controller,
           onChanged: _onChanged,
           onFieldSubmitted: widget.onFieldSubmitted,
-          validator: widget.validator ??
+          validator:
+              widget.validator ??
               (value) {
                 if (_suggestions
                     .where(
@@ -214,10 +216,7 @@ class CustomAutocompleteNewState extends State<CustomAutocompleteNew> {
                 });
                 _selected = null;
               },
-              icon: Icon(
-                Icons.close,
-                color: mekongOrange(isLight),
-              ),
+              icon: Icon(Icons.clear, color: mekongOrange(isLight)),
             ),
           ),
         ),
@@ -228,62 +227,65 @@ class CustomAutocompleteNewState extends State<CustomAutocompleteNew> {
             color: surface,
             child: SizedBox(
               height: _suggestions.isEmpty ? 50 : 200,
-              child: _suggestions.isEmpty
-                  ? Center(
-                      child: CustomText(
-                        'No data',
-                        fontSize: 16,
-                        fontStyle: FontStyle.italic,
-                        fontColor: outline,
-                      ),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      controller: _scrollController,
-                      separatorBuilder: (context, index) =>
-                          const Divider(height: 1),
-                      shrinkWrap: true,
-                      itemCount: _showLoading
-                          ? _suggestions.length + 1
-                          : _suggestions.length,
-                      itemBuilder: (context, index) {
-                        if (index == _suggestions.length) {
-                          if (!_showLoading) return Container();
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(4.0),
-                              child: SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+              child:
+                  _suggestions.isEmpty
+                      ? Center(
+                        child: CustomText(
+                          'No data',
+                          fontSize: 16,
+                          fontStyle: FontStyle.italic,
+                          fontColor: outline,
+                        ),
+                      )
+                      : ListView.separated(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        controller: _scrollController,
+                        separatorBuilder:
+                            (context, index) => const Divider(height: 1),
+                        shrinkWrap: true,
+                        itemCount:
+                            _showLoading
+                                ? _suggestions.length + 1
+                                : _suggestions.length,
+                        itemBuilder: (context, index) {
+                          if (index == _suggestions.length) {
+                            if (!_showLoading) return Container();
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(4.0),
+                                child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 ),
                               ),
+                            );
+                          }
+                          final suggestion = _suggestions[index];
+                          return CustomListTile(
+                            tileColor: surface,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8,
                             ),
+                            title: CustomText(
+                              suggestion.text,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            onTap: () {
+                              _controller.text = suggestion.text;
+                              if (!mounted) return;
+                              setState(() {
+                                _showSuggestions = false;
+                              });
+                              FocusScope.of(context).unfocus();
+                              widget.onSelected?.call(suggestion);
+                              _selected = suggestion;
+                            },
                           );
-                        }
-                        final suggestion = _suggestions[index];
-                        return CustomListTile(
-                          tileColor: surface,
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 8),
-                          title: CustomText(
-                            suggestion.text,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          onTap: () {
-                            _controller.text = suggestion.text;
-                            if (!mounted) return;
-                            setState(() {
-                              _showSuggestions = false;
-                            });
-                            FocusScope.of(context).unfocus();
-                            widget.onSelected?.call(suggestion);
-                            _selected = suggestion;
-                          },
-                        );
-                      },
-                    ),
+                        },
+                      ),
             ),
           ),
       ],

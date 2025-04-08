@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'custom_text_form_field.dart';
 
 /// A custom [TextFormField] for selecting location via map
@@ -127,14 +128,14 @@ class _CustomLocationFormFieldState extends State<CustomLocationFormField> {
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         visualDensity: const VisualDensity(
-                          horizontal: VisualDensity.minimumDensity,
                           vertical: VisualDensity.minimumDensity,
+                          horizontal: VisualDensity.minimumDensity,
                         ),
+                        icon: Icon(Icons.clear, color: Colors.red),
                         onPressed: () {
                           if (!mounted) return;
                           widget.latitudeTextController?.clear();
                         },
-                        icon: const Icon(Icons.close, color: Colors.red),
                       ),
                     ),
                   ),
@@ -159,14 +160,14 @@ class _CustomLocationFormFieldState extends State<CustomLocationFormField> {
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         visualDensity: const VisualDensity(
-                          horizontal: VisualDensity.minimumDensity,
                           vertical: VisualDensity.minimumDensity,
+                          horizontal: VisualDensity.minimumDensity,
                         ),
+                        icon: Icon(Icons.clear, color: Colors.red),
                         onPressed: () {
                           if (!mounted) return;
                           widget.longitudeTextController?.clear();
                         },
-                        icon: const Icon(Icons.close, color: Colors.red),
                       ),
                     ),
                   ),
