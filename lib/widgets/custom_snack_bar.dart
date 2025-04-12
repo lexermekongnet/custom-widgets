@@ -25,7 +25,11 @@ class CustomSnackBar extends SnackBar {
        );
 
   /// A method to show the snackbar
-  static void show(BuildContext context, {required String message}) {
+  static void show(
+    BuildContext context, {
+    required String message,
+    double? width,
+  }) {
     final theme = Theme.of(context);
     final surface = theme.colorScheme.surface;
     final inverseSurface = theme.colorScheme.onSurface;
@@ -35,6 +39,7 @@ class CustomSnackBar extends SnackBar {
         backgroundColor: surface,
         borderColor: inverseSurface,
         content: CustomText(message),
+        width: width,
       ),
     );
   }
